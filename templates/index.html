@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI Web</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Akaya+Telivigala&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            font-family: "Varela Round", sans-serif;
+        }
+
+        /* ✅ Top Bar */
+        #topBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 80px;
+            background-color: black;
+            box-sizing: border-box;
+            padding: 0 25px;
+            z-index: 100;
+        }
+
+        #logo {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        #aiBotLogo {
+            display: flex;
+            justify-content: center;/* centers the row */
+            flex-wrap: wrap;/* wraps on smaller screens */
+            gap: 20px;/* space between images */
+            animation: fadeIn 1.5s;
+        }
+
+        #aiBotLogo img {
+            margin-top: 70px;
+            width: 50px; /* change this to resize */
+            height: 50px;/*  optional (keeps them square) */
+            object-fit: cover;/* keeps image cropped nicely */
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        #webText {
+            color: #7b44bf;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        #aboutBtn {
+            background-color: #7b44bf;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #aboutBtn:hover {
+            background-color: #5f30a3;
+            transform: scale(1.1);
+        }
+
+        /* ✅ About Box Styling */
+        #aboutBox {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            /* hidden offscreen initially */
+            width: 350px;
+            height: 100%;
+            background-color: #1e1e1e;
+            /* dark grey box */
+            color: #f5f5f5;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            box-sizing: border-box;
+            transition: right 0.4s ease;
+            z-index: 300;
+            overflow-y: auto;
+        }
+
+        /* When active (visible) */
+        #aboutBox.active {
+            right: 0;
+        }
+
+        /* Close button */
+        #closeAbout {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #bbb;
+            font-size: 22px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        #closeAbout:hover {
+            color: white;
+        }
+
+        /* Heading & paragraph styling */
+        #aboutBox h2 {
+            margin-top: 40px;
+            color: #7b44bf;
+            font-family: "Varela Round", sans-serif;
+            font-size: 24px;
+        }
+
+        #aboutBox p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-top: 10px;
+            color: #ddd;
+            text-align: justify;
+        }
+
+        /* ✅ AI Bots Info Panel (left side popup) */
+        #botsBox {
+            position: fixed;
+            top: 0;
+            left: -400px;
+            /* hidden initially */
+            width: 350px;
+            height: 100%;
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            box-sizing: border-box;
+            transition: left 0.4s ease;
+            z-index: 300;
+            overflow-y: auto;
+        }
+
+        /* Visible when active */
+        #botsBox.active {
+            left: 0;
+        }
+
+        /* Close button */
+        #closeBots {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #bbb;
+            font-size: 22px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        #closeBots:hover {
+            color: white;
+        }
+
+        /* Title and layout */
+        #botsBox h2 {
+            color: #7b44bf;
+            font-family: "Varela Round", sans-serif;
+            font-size: 24px;
+            margin-top: 40px;
+        }
+
+        .bot-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .bot-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #2a2a2a;
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: transform 0.2s ease, background 0.2s;
+        }
+
+        .bot-item:hover {
+            background: #383838;
+            transform: scale(1.05);
+        }
+
+        .bot-item img {
+            height: 35px;
+            width: 35px;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+
+        .bot-item span {
+            font-size: 16px;
+            color: #fff;
+        }
+
+
+        /* ✅ Welcome Text */
+        #welcomeMsg1,
+        #welcomeMsg2 {
+            display: inline;
+            padding-right: 8px;
+            font-family: "Akaya Telivigala", cursive;
+            font-size: 60px;
+        }
+
+        #welcomeMsg2 {
+            color: #7b44bf;
+        }
+
+        #subtext {
+            font-size: 20px;
+            text-decoration: underline;
+        }
+
+        /* ✅ Account Buttons */
+        #accountBtns {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        #loginBtn,
+        #signupBtn {
+            font-family: "Varela Round", sans-serif;
+            background-color: #2955c3;
+            width: 180px;
+            height: 45px;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-decoration: underline;
+            text-align: center;
+        }
+
+        #loginBtn:hover,
+        #signupBtn:hover {
+            background-color: #1a3f9d;
+            transform: scale(1.1);
+        }
+
+        /* Skip link */
+        #skipBtn {
+            background-color: #000;
+            border: 0;
+            margin-top: 25px;
+            text-decoration: underline;
+            color: #7b44bf;
+            cursor: pointer;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        #skipBtn:hover {
+            color: #a566ff;
+        }
+
+        /* ✅ Popup Styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .popup-content {
+            background: #111;
+            padding: 30px 40px;
+            border-radius: 15px;
+            width: 320px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .popup-content h2 {
+            color: #7b44bf;
+            margin-bottom: 15px;
+        }
+
+        .popup-content input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 12px 0;
+            border-radius: 10px;
+            border: 2px solid #222;
+            outline: none;
+            font-size: 16px;
+            background-color: #222;
+            color: white;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: white;
+        }
+
+        #createAcc,
+        #loginBtnIn {
+            background-color: #2955c3;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin-top: 10px;
+        }
+
+        #createAcc:hover,
+        #loginBtnIn:hover {
+            background-color: #1a3f9d;
+            transform: scale(1.1);
+        }
+
+        /* ⚠️ Warning Box */
+        #alertBox {
+            display: none;
+            background-color: #b81b1b;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            width: 280px;
+            margin: 10px auto;
+            font-size: 15px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        #aiBotlogo {
+            display: flex;
+            flex-direction: row;
+            size: 20px;
+        }
+
+        .aibotlogo {
+            width: 10px;
+            height: 10px;
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ✅ Footer Styling */
+        #footer {
+            background-color: #111;
+            color: #ccc;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 160px;
+            border-top: 1px solid #222;
+            font-family: "Varela Round", sans-serif;
+        }
+
+        #footer h4 {
+            color: #7b44bf;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        #footer p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 10px auto;
+            max-width: 700px;
+        }
+
+        #footer .disclaimer {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 20px;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+        }
+
+        .footer-links {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+
+        .footer-links a {
+            color: #7b44bf;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #a566ff;
+            text-decoration: underline;
+        }
+
+        #footer .copyright {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 20px;
+        }
+
+        /* 🌍 RESPONSIVE OPTIMIZATION */
+
+        /* Tablets */
+        @media (max-width: 1024px) {
+            #topBar {
+                height: 70px;
+                padding: 0 20px;
+            }
+
+            #webText {
+                font-size: 24px;
+            }
+
+            #aboutBtn {
+                font-size: 15px;
+                padding: 8px 16px;
+            }
+
+            #welcomeMsg1,
+            #welcomeMsg2 {
+                font-size: 50px;
+            }
+
+            #subtext {
+                font-size: 18px;
+            }
+
+            #loginBtn,
+            #signupBtn {
+                width: 160px;
+                height: 42px;
+            }
+
+            #aboutBox,
+            #botsBox {
+                width: 300px;
+            }
+        }
+
+        /* Mobile Phones */
+        @media (max-width: 768px) {
+            #topBar {
+                flex-direction: row;
+                justify-content: space-between;
+                height: 65px;
+                padding: 0 15px;
+            }
+
+            #webText {
+                font-size: 20px;
+            }
+
+            #logo {
+                height: 40px;
+            }
+
+            #welcomeMsg1,
+            #welcomeMsg2 {
+                font-size: 36px;
+                display: block;
+            }
+
+            #subtext {
+                font-size: 16px;
+            }
+
+            #accountBtns {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            #loginBtn,
+            #signupBtn {
+                width: 80%;
+                height: 40px;
+            }
+
+            #aboutBtn {
+                padding: 6px 12px;
+                font-size: 14px;
+                border-radius: 12px;
+            }
+
+            #popup .popup-content {
+                width: 90%;
+                padding: 20px;
+            }
+
+            /* AI Bots Popup centered for mobile */
+            #botPopup {
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            #botPopupContent {
+                width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+            }
+
+            /* Footer adjustments */
+            #footer {
+                padding: 25px 10px;
+                margin-top: 80px;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .footer-links a {
+                font-size: 0.85rem;
+            }
+
+            #footer p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Small Phones */
+        @media (max-width: 480px) {
+            #webText {
+                font-size: 18px;
+            }
+
+            #welcomeMsg1,
+            #welcomeMsg2 {
+                font-size: 28px;
+            }
+
+            #subtext {
+                font-size: 14px;
+            }
+
+            #loginBtn,
+            #signupBtn {
+                width: 90%;
+            }
+
+            #botPopupContent {
+                width: 95%;
+                font-size: 14px;
+            }
+
+            #footer h4 {
+                font-size: 1.2rem;
+            }
+
+            #footer p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ✅ Top Bar -->
+    <div id="topBar">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img id="logo" src="../static/logos/AiWebLogo.png" alt="Logo">
+            <h5 id="webText">AI Web</h5>
+        </div>
+        <button id="aboutBtn">About</button>
+    </div>
+
+    <!-- ✅ Main Section -->
+    <div style="margin-top: 120px; color: white; text-align: center;">
+        <div id="welcomeMsg">
+            <p id="welcomeMsg1">Welcome to</p>
+            <p id="welcomeMsg2">AI Web</p>
+        </div>
+        <p id="subtext">Only website you need for AI</p>
+
+        <div id="accountBtns">
+            <button id="loginBtn">Login</button>
+            <button id="signupBtn">Sign Up</button>
+        </div>
+        <button id="skipBtn">Skip for now</button>
+        <div id="aiBotLogo">
+            <div class="aiBotLogo"><img src="../static/logos/icons8-chatgpt-96.png" alt="ChatGPT"></div>
+            <div class="aiBotLogo"><img src="../static/logos/icons8-perplexity-ai-96.png" alt="Perplexity"></div>
+            <div class="aiBotLogo"><img src="../static/logos/icons8-claude-96.png" alt="Claude"></div>
+            <div class="aiBotLogo"><img src="../static/logos/icons8-github-copilot-96.png" alt="GitHub Copilot"></div>
+            <div class="aiBotLogo"><img src="../static/logos/gemini-color.png" alt="Gemini"></div>
+            <div class="aiBotLogo"><img src="../static/logos/icons8-deepseek-96.png" alt="DeepSeek"></div>
+        </div>
+    </div>
+
+    <!-- ✅ Popup -->
+    <div class="popup" id="popup">
+        <div class="popup-content" id="popupContent">
+            <button class="close-btn" id="closePopup">&times;</button>
+            <h2 id="popupTitle">Login</h2>
+            <div id="alertBox">⚠️ Something went wrong. Please check your entered details.</div>
+            <div id="popupBody"></div>
+        </div>
+    </div>
+
+    <!-- ✅ About Box -->
+    <div id="aboutBox">
+        <button id="closeAbout">&times;</button>
+        <h2>About AI Web</h2>
+        <p>
+            Welcome to <strong>AI Web</strong> — your all-in-one hub for exploring and comparing AI models.
+            Here, you can get answers from multiple AI bots in one place, saving you time and effort.
+        </p>
+        <p>
+            Our goal is to make AI access simple, efficient, and powerful for everyone — whether you’re
+            researching, coding, or just exploring ideas.
+        </p>
+        <p>
+            Stay tuned for more updates as we expand our range of integrated AI models and tools!
+        </p>
+    </div>
+
+    <!-- ✅ AI Bots Info Panel -->
+    <div class="popup" id="botPopup">
+        <div class="popup-content" id="botPopupContent">
+            <button class="close-btn" id="closeBotPopup">&times;</button>
+            <h2>AI Bots Available</h2>
+            <div class="bot-list">
+                <div class="bot-item"><img src="../static/logos/icons8-chatgpt-96.png" alt="ChatGPT"><span>ChatGPT</span></div>
+                <div class="bot-item"><img src="../static/logos/icons8-perplexity-ai-96.png" alt="Perplexity"><span>Perplexity</span>
+                </div>
+                <div class="bot-item"><img src="../static/logos/icons8-claude-96.png" alt="Claude"><span>Claude</span></div>
+                <div class="bot-item"><img src="../static/logos/icons8-github-copilot-96.png" alt="GitHub Copilot"><span>GitHub
+                        Copilot</span></div>
+                <div class="bot-item"><img src="../static/logos/gemini-color.png" alt="Gemini"><span>Gemini</span></div>
+                <div class="bot-item"><img src="../static/logos/icons8-deepseek-96.png" alt="DeepSeek"><span>DeepSeek</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Footer Section -->
+    <footer id="footer">
+        <div class="footer-content">
+            <h4>AI Web</h4>
+            <p>
+                AI Web is an independent platform that allows users to explore and compare AI models like ChatGPT,
+                Claude, Gemini, Perplexity, and more — all in one place.
+                We do not claim ownership or official affiliation with any of these services.
+            </p>
+
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> All product names, logos, and brands are property of their respective
+                owners.
+                Use of these names or logos does not imply endorsement. API and data usage comply with respective
+                platform terms.
+            </p>
+
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Use</a>
+                <a href="#">Contact Us</a>
+            </div>
+
+            <p class="copyright">© 2025 AI Web. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        const popup = document.getElementById("popup");
+        const popupTitle = document.getElementById("popupTitle");
+        const popupBody = document.getElementById("popupBody");
+        const closePopup = document.getElementById("closePopup");
+        const alertBox = document.getElementById("alertBox");
+
+        // Show warning alert
+        function showAlert() {
+            alertBox.style.display = "block";
+            setTimeout(() => (alertBox.style.display = "none"), 2500);
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // ✅ Login Popup
+        document.getElementById("loginBtn").addEventListener("click", () => {
+            popupTitle.textContent = "Login";
+            popupBody.innerHTML = `
+    <input id="loginEmail" type="text" placeholder="Email or Username" />
+    <input id="loginPass" type="password" placeholder="Password" />
+    <button id="loginBtnIn">Login</button>
+  `;
+            popup.style.display = "flex";
+
+            document.getElementById("loginBtnIn").addEventListener("click", () => {
+                const email = document.getElementById("loginEmail").value.trim();
+                const pass = document.getElementById("loginPass").value.trim();
+                if (!email || !pass || !isValidEmail(email)) showAlert();
+                else window.location.href = "/select";
+            });
+        });
+
+        // ✅ Sign Up Popup
+        document.getElementById("signupBtn").addEventListener("click", () => {
+            popupTitle.textContent = "Sign Up";
+            popupBody.innerHTML = `
+    <input id="signupName" type="text" placeholder="Full Name" />
+    <input id="signupEmail" type="email" placeholder="Email" />
+    <input id="signupPass" type="password" placeholder="Password" />
+    <button id="createAcc">Create Account</button>
+  `;
+            popup.style.display = "flex";
+
+            document.getElementById("createAcc").addEventListener("click", () => {
+                const name = document.getElementById("signupName").value.trim();
+                const email = document.getElementById("signupEmail").value.trim();
+                const pass = document.getElementById("signupPass").value.trim();
+                if (!name || !email || !pass || !isValidEmail(email)) showAlert();
+                else window.location.href = "/select";
+            });
+        });
+
+        // ✅ Close Login/Signup Popup
+        closePopup.addEventListener("click", () => (popup.style.display = "none"));
+        popup.addEventListener("click", (e) => {
+            if (e.target === popup) popup.style.display = "none";
+        });
+
+        // ✅ Skip button
+        document.getElementById("skipBtn").addEventListener("click", () => {
+            window.location.href = "/select";
+        });
+
+        // ✅ About Box
+        const aboutBox = document.getElementById("aboutBox");
+        const aboutBtn = document.getElementById("aboutBtn");
+        const closeAbout = document.getElementById("closeAbout");
+
+        // Open About Box
+        aboutBtn.addEventListener("click", () => aboutBox.classList.add("active"));
+
+        // Close About Box
+        closeAbout.addEventListener("click", () => aboutBox.classList.remove("active"));
+
+        // ✅ Close About if click outside
+        document.addEventListener("click", (e) => {
+            if (
+                aboutBox.classList.contains("active") &&
+                !aboutBox.contains(e.target) &&
+                !aboutBtn.contains(e.target)
+            ) {
+                aboutBox.classList.remove("active");
+            }
+        });
+
+        // ✅ AI Bots Popup
+        const botPopup = document.getElementById("botPopup");
+        const botPopupContent = document.getElementById("botPopupContent");
+        const logo = document.getElementById("logo");
+        const closeBotPopup = document.getElementById("closeBotPopup");
+
+        // Show when clicking logo
+        logo.addEventListener("click", () => (botPopup.style.display = "flex"));
+
+        // Close when clicking X
+        closeBotPopup.addEventListener("click", () => (botPopup.style.display = "none"));
+
+        // ✅ Close Bots popup when clicking outside
+        botPopup.addEventListener("click", (e) => {
+            if (!botPopupContent.contains(e.target)) botPopup.style.display = "none";
+        });
+
+        // ✅ Mobile Tap Support for AI Bots Popup
+        if (window.innerWidth <= 768) {
+            logo.addEventListener("click", (e) => {
+                e.stopPropagation();
+                botPopup.style.display =
+                    botPopup.style.display === "flex" ? "none" : "flex";
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!botPopup.contains(e.target) && e.target !== logo) {
+                    botPopup.style.display = "none";
+                }
+            });
+        }
+
+
+    </script>
+
+
+
+</body>
+
+</html>
